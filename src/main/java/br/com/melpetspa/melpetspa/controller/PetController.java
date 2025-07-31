@@ -4,7 +4,6 @@ import br.com.melpetspa.melpetspa.dto.PetCreateDTO;
 import br.com.melpetspa.melpetspa.dto.PetDTO;
 import br.com.melpetspa.melpetspa.service.PetService;
 import br.com.melpetspa.melpetspa.service.UserService;
-import br.com.melpetspa.melpetspa.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +16,7 @@ public class PetController {
     private final PetService petService;
 
     @Autowired
-    public PetController(PetService petService, JwtUtil jwtUtil) {
+    public PetController(PetService petService) {
         this.petService = petService;
     }
 
