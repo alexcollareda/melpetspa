@@ -1,44 +1,30 @@
 package br.com.melpetspa.melpetspa.service;
 
-import br.com.melpetspa.melpetspa.dto.PetCreateDTO;
-import br.com.melpetspa.melpetspa.dto.PetDTO;
-import br.com.melpetspa.melpetspa.entity.ClientEntity;
+import br.com.melpetspa.melpetspa.dto.CreatePetRequestDTO;
 import br.com.melpetspa.melpetspa.entity.PetEntity;
-import br.com.melpetspa.melpetspa.entity.RaceEntity;
 import br.com.melpetspa.melpetspa.repository.PetRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import br.com.melpetspa.melpetspa.repository.RacaRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Service
+@RequiredArgsConstructor
 public class PetService {
+    private final PetRepository petRepository;
+    private final RacaRepository racaRepository;
 
-    @Autowired
-    private PetRepository petRepository;
-
-    public List<PetDTO> getPetByClient(Long idClient) {
-        List<PetEntity> petEntityList = petRepository.findByIdClient(idClient);
-        return convertToDtoList(petEntityList);
+    public PetResponseDTO criarPet(CreatePetRequestDTO dto) {
+        PetEntity pet = new PetEntity();
+        pet.setNomePet(dto.getNomePet());
+        pet.setNomeTutor(dto.getNomeTutor());
+        pet.setRaca(racaRepository.findById(dto.getIdRaca()).orElseThrow());
+        pet.setDataHoraInclusao(LocalDateTime.now());
+        return toDTO(petRepository.save(pet));
     }
 
-    private List<PetDTO> convertToDtoList(List<PetEntity> petEntityList){
-        return Collections.singletonList(new PetDTO());
-    }
-
-    public void createPet(PetCreateDTO petDTO) {
-        PetEntity petEntity = new PetEntity();
-        petEntity.setClient(new ClientEntity(petDTO.getIdCliente()));
-        petEntity.setRace(new RaceEntity(petDTO.getIdRace()));
-
-        petEntity.setName(petDTO.getName());
-        petEntity.setChipCode(petDTO.getChipCode());
-        petEntity.setPhoto(petDTO.getPhoto());
-        petEntity.setBornDate(petDTO.getBornDate());
-        petEntity.setGenderEnum(petDTO.getGenderEnum());
-        petEntity.setSpeciesEnum(petDTO.getSpeciesEnum());
-
-        petRepository.save(petEntity);
+    private PetResponseDTO toDTO(PetEntity entity) {
+        return null;
     }
 }

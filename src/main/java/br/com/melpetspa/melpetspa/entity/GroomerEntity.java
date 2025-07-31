@@ -1,26 +1,22 @@
 package br.com.melpetspa.melpetspa.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
-public class PetEntity {
+public class GroomerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idPet;
-
-    private String nomePet;
-    private String nomeTutor;
-    private LocalDateTime dataHoraInclusao;
-
-    @ManyToOne
-    private RacaEntity raca;
+    private Integer idGroomer;
+    private String nomeGroomer;
 }
