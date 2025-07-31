@@ -46,4 +46,6 @@ public class CheckInPetEntity {
 
     @Enumerated(EnumType.STRING)
     private StatusCheckInEnum status;
+
+    }
 }

@@ -1,10 +1,13 @@
 package br.com.melpetspa.melpetspa.controller;
 
 import br.com.melpetspa.melpetspa.dto.CreatePetRequestDTO;
+import br.com.melpetspa.melpetspa.dto.PetResponseDTO;
 import br.com.melpetspa.melpetspa.service.PetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/pets")
@@ -19,6 +22,6 @@ public class PetController {
 
     @GetMapping
     public List<PetResponseDTO> listarPets() {
-        // listar pets
+        return List.of();
     }
 }

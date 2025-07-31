@@ -1,5 +1,6 @@
 package br.com.melpetspa.melpetspa.controller;
 
+import br.com.melpetspa.melpetspa.dto.CheckInResponseDTO;
 import br.com.melpetspa.melpetspa.dto.CreateCheckInRequestDTO;
 import br.com.melpetspa.melpetspa.dto.EndJobRequestDTO;
 import br.com.melpetspa.melpetspa.dto.StartJobRequestDTO;
@@ -7,6 +8,8 @@ import br.com.melpetspa.melpetspa.service.CheckInService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/checkins")
@@ -30,12 +33,12 @@ public class CheckInController {
     }
 
     @GetMapping("/hoje")
-    public List<CheckInResponseDTO> listarHoje() {
+    public List<CheckInResponseDTO> listToDay() {
         return service.listarCheckinsHoje();
     }
 
     @GetMapping("/buscar")
-    public List<CheckInResponseDTO> buscar(@RequestParam String data) {
+    public List<CheckInResponseDTO> search(@RequestParam String data) {
         return service.buscarPorData(data);
     }
 }

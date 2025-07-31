@@ -1,5 +1,6 @@
 package br.com.melpetspa.melpetspa.service;
 
+import br.com.melpetspa.melpetspa.dto.CheckInResponseDTO;
 import br.com.melpetspa.melpetspa.dto.CreateCheckInRequestDTO;
 import br.com.melpetspa.melpetspa.dto.EndJobRequestDTO;
 import br.com.melpetspa.melpetspa.dto.StartJobRequestDTO;
@@ -15,49 +16,50 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CheckInService {
-    private final CheckInPetRepository repo;
-    private final PetRepository petRepo;
-    private final ServicoRepository servicoRepo;
-    private final GroomerRepository groomerRepo;
+    private final CheckInPetRepository checkInPetRepository;
+    private final PetRepository petRepository;
+    private final ServicoRepository servicoRepository;
+    private final GroomerRepository groomerRepository;
 
-    public CheckInResponseDTO criarCheckIn(CreateCheckInRequestDTO dto) {
+    public CheckInResponseDTO criarCheckIn(CreateCheckInRequestDTO createCheckInRequestDTO) {
         CheckInPetEntity checkin = new CheckInPetEntity();
-        checkin.setPet(petRepo.findById(dto.getIdPet()).orElseThrow());
-        checkin.setServicos(servicoRepo.findAllById(dto.getIdServicos()));
-        checkin.setIsColocaEnfeite(dto.isColocaEnfeite());
-        checkin.setIsPassaPerfume(dto.isPassaPerfume());
-        checkin.setIsHoraRetorno(dto.isHoraRetorno());
-        checkin.setDataHoraRetorno(dto.getDataHoraRetorno());
-        checkin.setObservacoes(dto.getObservacoes());
+        checkin.setPet(petRepository.findById(createCheckInRequestDTO.getIdPet()).orElseThrow());
+        checkin.setServicos(servicoRepository.findAllById(createCheckInRequestDTO.getIdServicos()));
+        checkin.setColocaEnfeite(createCheckInRequestDTO.isColocaEnfeite());
+        checkin.setPassaPerfume(createCheckInRequestDTO.isPassaPerfume());
+        checkin.setHoraRetorno(createCheckInRequestDTO.isHoraRetorno());
+        checkin.setDataHoraRetorno(createCheckInRequestDTO.getDataHoraRetorno());
+        checkin.setObservacoes(createCheckInRequestDTO.getObservacoes());
         checkin.setDataHoraCriacao(LocalDateTime.now());
         checkin.setStatus(StatusCheckInEnum.AGUARDANDO);
-        return toDTO(repo.save(checkin));
+        return toDTO(checkInPetRepository.save(checkin));
     }
 
-    public CheckInResponseDTO iniciarTrabalho(StartJobRequestDTO dto) {
-        CheckInPetEntity checkin = repo.findById(dto.getIdCheckIn()).orElseThrow();
-        checkin.setGroomer(groomerRepo.findById(dto.getIdGroomer()).orElseThrow());
+    public CheckInResponseDTO iniciarTrabalho(StartJobRequestDTO startJobRequestDTO) {
+        CheckInPetEntity checkin = checkInPetRepository.findById(startJobRequestDTO.getIdCheckIn()).orElseThrow();
+        checkin.setGroomer(groomerRepository.findById(startJobRequestDTO.getIdGroomer()).orElseThrow());
         checkin.setStatus(StatusCheckInEnum.INICIADO);
         checkin.setDataHoraAlteracao(LocalDateTime.now());
-        return toDTO(repo.save(checkin));
+        return toDTO(checkInPetRepository.save(checkin));
     }
 
-    public CheckInResponseDTO finalizarTrabalho(EndJobRequestDTO dto) {
-        CheckInPetEntity checkin = repo.findById(dto.getIdCheckIn()).orElseThrow();
+    public CheckInResponseDTO finalizarTrabalho(EndJobRequestDTO endJobRequestDTO) {
+        CheckInPetEntity checkin = checkInPetRepository.findById(endJobRequestDTO.getIdCheckIn()).orElseThrow();
         checkin.setStatus(StatusCheckInEnum.FINALIZADO);
         checkin.setDataHoraFinalizacao(LocalDateTime.now());
-        return toDTO(repo.save(checkin));
+        return toDTO(checkInPetRepository.save(checkin));
     }
 
     public List<CheckInResponseDTO> listarCheckinsHoje() {
         LocalDateTime start = LocalDate.now().atStartOfDay();
         LocalDateTime end = start.plusDays(1);
-        return repo.findAllByDataHoraCriacaoBetween(start, end)
+        return checkInPetRepository.findAllByDataHoraCriacaoBetween(start, end)
                 .stream().map(this::toDTO).collect(Collectors.toList());
     }
 
@@ -66,12 +68,11 @@ public class CheckInService {
         LocalDate localDate = LocalDate.parse(data, formatter);
         LocalDateTime start = localDate.atStartOfDay();
         LocalDateTime end = start.plusDays(1);
-        return repo.findAllByDataHoraCriacaoBetween(start, end)
+        return checkInPetRepository.findAllByDataHoraCriacaoBetween(start, end)
                 .stream().map(this::toDTO).collect(Collectors.toList());
     }
 
     private CheckInResponseDTO toDTO(CheckInPetEntity entity) {
-        // Mapear para DTO
         return null;
     }
 }

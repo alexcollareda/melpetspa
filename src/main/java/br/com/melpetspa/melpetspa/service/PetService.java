@@ -1,6 +1,7 @@
 package br.com.melpetspa.melpetspa.service;
 
 import br.com.melpetspa.melpetspa.dto.CreatePetRequestDTO;
+import br.com.melpetspa.melpetspa.dto.PetResponseDTO;
 import br.com.melpetspa.melpetspa.entity.PetEntity;
 import br.com.melpetspa.melpetspa.repository.PetRepository;
 import br.com.melpetspa.melpetspa.repository.RacaRepository;
