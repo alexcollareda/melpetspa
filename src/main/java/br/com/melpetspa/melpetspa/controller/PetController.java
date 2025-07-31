@@ -1,32 +1,24 @@
 package br.com.melpetspa.melpetspa.controller;
 
-import br.com.melpetspa.melpetspa.dto.PetCreateDTO;
-import br.com.melpetspa.melpetspa.dto.PetDTO;
+import br.com.melpetspa.melpetspa.dto.CreatePetRequestDTO;
 import br.com.melpetspa.melpetspa.service.PetService;
-import br.com.melpetspa.melpetspa.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/pet")
+@RequestMapping("/pets")
+@RequiredArgsConstructor
 public class PetController {
-
     private final PetService petService;
 
-    @Autowired
-    public PetController(PetService petService) {
-        this.petService = petService;
-    }
-
-    @GetMapping("/list/{idClient}")
-    public List<PetDTO> getPetByClient(@PathVariable("idClient") Long idClient){
-        return petService.getPetByClient(idClient);
-    }
-
     @PostMapping
-    public void createPet(@RequestBody PetCreateDTO petDTO){
-        petService.createPet(petDTO);
+    public PetResponseDTO criarPet(@RequestBody @Valid CreatePetRequestDTO createPetRequestDTO) {
+        return petService.criarPet(createPetRequestDTO);
+    }
+
+    @GetMapping
+    public List<PetResponseDTO> listarPets() {
+        // listar pets
     }
 }
