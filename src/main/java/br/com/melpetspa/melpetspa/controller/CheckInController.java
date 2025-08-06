@@ -14,10 +14,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/checkins")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:5173/")
 public class CheckInController {
     private final CheckInService service;
 
-    @PostMapping
+    @PostMapping("/create")
     public CheckInResponseDTO create(@RequestBody @Valid CreateCheckInRequestDTO createCheckInRequestDTO) {
         return service.criarCheckIn(createCheckInRequestDTO);
     }

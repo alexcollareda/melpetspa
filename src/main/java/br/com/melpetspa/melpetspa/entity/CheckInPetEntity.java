@@ -35,6 +35,7 @@ public class CheckInPetEntity {
     private boolean isPassaPerfume;
     private boolean isHoraRetorno;
     private LocalDateTime dataHoraRetorno;
+    private String priority;
     private String observacoes;
 
     @ManyToOne
@@ -47,5 +48,4 @@ public class CheckInPetEntity {
     @Enumerated(EnumType.STRING)
     private StatusCheckInEnum status;
 
-    }
 }
