@@ -33,6 +33,7 @@ public class CheckInService {
         checkin.setServicos(servicoRepository.findAllById(createCheckInRequestDTO.getIdServicos()));
         checkin.setColocaEnfeite(createCheckInRequestDTO.isColocaEnfeite());
         checkin.setPassaPerfume(createCheckInRequestDTO.isPassaPerfume());
+        checkin.setPriority(createCheckInRequestDTO.getPriority());
         checkin.setHoraRetorno(createCheckInRequestDTO.isHoraRetorno());
         checkin.setDataHoraRetorno(createCheckInRequestDTO.getDataHoraRetorno());
         checkin.setObservacoes(createCheckInRequestDTO.getObservacoes());

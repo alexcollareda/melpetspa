@@ -14,6 +14,7 @@ public class CreateCheckInRequestDTO {
     private List<Integer> idServicos;
     private boolean isColocaEnfeite;
     private boolean isPassaPerfume;
+    private String priority;
     private boolean isHoraRetorno;
     private LocalDateTime dataHoraRetorno;
     private String observacoes;
