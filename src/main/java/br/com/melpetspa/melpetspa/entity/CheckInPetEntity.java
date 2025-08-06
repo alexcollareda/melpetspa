@@ -29,7 +29,7 @@ public class CheckInPetEntity {
             name = "checkin_servico",
             joinColumns = @JoinColumn(name = "checkin_id"),
             inverseJoinColumns = @JoinColumn(name = "servico_id"))
-    private List<ServicoEntity> servicos = new ArrayList<>();
+    private List<ServiceEntity> servicos = new ArrayList<>();
 
     private boolean isColocaEnfeite;
     private boolean isPassaPerfume;

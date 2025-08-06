@@ -9,7 +9,7 @@ import br.com.melpetspa.melpetspa.entity.enums.StatusCheckInEnum;
 import br.com.melpetspa.melpetspa.repository.CheckInPetRepository;
 import br.com.melpetspa.melpetspa.repository.GroomerRepository;
 import br.com.melpetspa.melpetspa.repository.PetRepository;
-import br.com.melpetspa.melpetspa.repository.ServicoRepository;
+import br.com.melpetspa.melpetspa.repository.ServiceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class CheckInService {
     private final CheckInPetRepository checkInPetRepository;
     private final PetRepository petRepository;
-    private final ServicoRepository servicoRepository;
+    private final ServiceRepository servicoRepository;
     private final GroomerRepository groomerRepository;
 
     public CheckInResponseDTO criarCheckIn(CreateCheckInRequestDTO createCheckInRequestDTO) {

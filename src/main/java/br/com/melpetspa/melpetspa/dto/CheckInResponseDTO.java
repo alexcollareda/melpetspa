@@ -1,12 +1,16 @@
 package br.com.melpetspa.melpetspa.dto;
 
 import br.com.melpetspa.melpetspa.entity.enums.StatusCheckInEnum;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class CheckInResponseDTO {
     private Long idCheckin;
 
@@ -17,7 +21,7 @@ public class CheckInResponseDTO {
     private String racaNome;
     private String racaEspecie;
 
-    private List<ServicoResponseDTO> servicos;
+    private List<ServiceResponseDTO> servicos;
 
     private boolean isColocaEnfeite;
     private boolean isPassaPerfume;
