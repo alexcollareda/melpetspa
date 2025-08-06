@@ -1,10 +1,10 @@
 package br.com.melpetspa.melpetspa.repository;
 
-import br.com.melpetspa.melpetspa.entity.ServicoEntity;
+import br.com.melpetspa.melpetspa.entity.ServiceEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ServicoRepository extends JpaRepository<ServicoEntity, Integer> {
+public interface ServiceRepository extends JpaRepository<ServiceEntity, Integer> {
 
 }
