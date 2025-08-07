@@ -1,6 +1,6 @@
 package br.com.melpetspa.melpetspa.entity;
 
-import br.com.melpetspa.melpetspa.entity.enums.EspecieEnum;
+import br.com.melpetspa.melpetspa.entity.enums.SpecieEnum;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,9 +12,10 @@ import lombok.*;
 public class RacaEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idRaca;
+    @JoinColumn(name = "name_race")
+    private String nameRace;
 
-    private String nomeRaca;
-
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private EspecieEnum especie;
+    private SpecieEnum especie;
 }

@@ -25,9 +25,6 @@ public class CheckInResponseDTO {
 
     private boolean isColocaEnfeite;
     private boolean isPassaPerfume;
-    private boolean isHoraRetorno;
-
-    private LocalDateTime dataHoraRetorno;
     private String priority;
     private String observacoes;
 

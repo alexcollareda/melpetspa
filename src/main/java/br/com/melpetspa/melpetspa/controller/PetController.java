@@ -5,6 +5,7 @@ import br.com.melpetspa.melpetspa.dto.PetResponseDTO;
 import br.com.melpetspa.melpetspa.service.PetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +20,11 @@ public class PetController {
     public PetResponseDTO criarPet(@RequestBody @Valid CreatePetRequestDTO createPetRequestDTO) {
         return petService.criarPet(createPetRequestDTO);
     }
-
+    @GetMapping("/pets/search")
+    public ResponseEntity<List<PetResponseDTO>> searchPetsByName(@RequestParam String nomePet) {
+        List<PetResponseDTO> pets = petService.searchPetsByName(nomePet);
+        return ResponseEntity.ok(pets);
+    }
     @GetMapping
     public List<PetResponseDTO> listarPets() {
         return List.of();
