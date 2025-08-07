@@ -1,12 +1,11 @@
 package br.com.melpetspa.melpetspa.controller;
 
-import br.com.melpetspa.melpetspa.dto.CheckInResponseDTO;
-import br.com.melpetspa.melpetspa.dto.CreateCheckInRequestDTO;
-import br.com.melpetspa.melpetspa.dto.EndJobRequestDTO;
-import br.com.melpetspa.melpetspa.dto.StartJobRequestDTO;
+import br.com.melpetspa.melpetspa.dto.*;
 import br.com.melpetspa.melpetspa.service.CheckInService;
+import br.com.melpetspa.melpetspa.service.PetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

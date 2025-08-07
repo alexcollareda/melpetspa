@@ -1,5 +1,6 @@
 package br.com.melpetspa.melpetspa.entity;
 
+import br.com.melpetspa.melpetspa.entity.enums.SpecieEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,5 +23,8 @@ public class PetEntity {
     private LocalDateTime dataHoraInclusao;
 
     @ManyToOne
-    private RacaEntity raca;
+    private RacaEntity race;
+
+    private SpecieEnum especie;
+
 }

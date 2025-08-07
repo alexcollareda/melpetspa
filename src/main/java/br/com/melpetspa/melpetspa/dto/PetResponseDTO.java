@@ -1,6 +1,7 @@
 package br.com.melpetspa.melpetspa.dto;
 
-import br.com.melpetspa.melpetspa.entity.enums.EspecieEnum;
+import br.com.melpetspa.melpetspa.entity.RacaEntity;
+import br.com.melpetspa.melpetspa.entity.enums.SpecieEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,5 +19,5 @@ public class PetResponseDTO {
 
     private Integer idRaca;
     private String nomeRaca;
-    private EspecieEnum especie;
+    private SpecieEnum especie;
 }
