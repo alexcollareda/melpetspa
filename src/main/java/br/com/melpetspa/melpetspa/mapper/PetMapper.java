@@ -10,10 +10,9 @@ public class PetMapper {
                 entity.getIdPet(),
                 entity.getNomePet(),
                 entity.getNomeTutor(),
-                entity.getDataHoraInclusao(),
-                entity.getRace().getIdRaca(),
+                entity.getRace().getIdRace(),
                 entity.getRace().getNameRace(),
-                entity.getRace().getEspecie()
+                entity.getRace().getSpecie()
         );
     }
 }

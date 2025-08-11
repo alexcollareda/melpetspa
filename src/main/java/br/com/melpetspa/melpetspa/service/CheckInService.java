@@ -34,8 +34,6 @@ public class CheckInService {
         checkin.setColocaEnfeite(createCheckInRequestDTO.isColocaEnfeite());
         checkin.setPassaPerfume(createCheckInRequestDTO.isPassaPerfume());
         checkin.setPriority(createCheckInRequestDTO.getPriority());
-        checkin.setHoraRetorno(createCheckInRequestDTO.isHoraRetorno());
-        checkin.setDataHoraRetorno(createCheckInRequestDTO.getDataHoraRetorno());
         checkin.setObservacoes(createCheckInRequestDTO.getObservacoes());
         checkin.setDataHoraCriacao(LocalDateTime.now());
         checkin.setStatus(StatusCheckInEnum.AGUARDANDO);
