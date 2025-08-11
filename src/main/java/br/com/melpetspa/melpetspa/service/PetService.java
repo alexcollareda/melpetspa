@@ -2,7 +2,9 @@ package br.com.melpetspa.melpetspa.service;
 
 import br.com.melpetspa.melpetspa.dto.CreatePetRequestDTO;
 import br.com.melpetspa.melpetspa.dto.PetResponseDTO;
+import br.com.melpetspa.melpetspa.dto.RacaResponseDTO;
 import br.com.melpetspa.melpetspa.entity.PetEntity;
+import br.com.melpetspa.melpetspa.entity.RacaEntity;
 import br.com.melpetspa.melpetspa.entity.enums.SpecieEnum;
 import br.com.melpetspa.melpetspa.mapper.PetMapper;
 import br.com.melpetspa.melpetspa.repository.PetRepository;
@@ -23,7 +25,7 @@ public class PetService {
         PetEntity pet = new PetEntity();
         pet.setNomePet(createPetRequestDTO.getNomePet());
         pet.setNomeTutor(createPetRequestDTO.getNomeTutor());
-        pet.setRace(racaRepository.findById(createPetRequestDTO.getIdRaca()).orElseThrow());
+        pet.setRace(racaRepository.findById(Long.valueOf(createPetRequestDTO.getIdRaca())).orElseThrow());
         return toResponseDTO(petRepository.save(pet));
     }
     public List<PetResponseDTO> searchPetsByName(String nomePet) {
@@ -32,18 +34,18 @@ public class PetService {
                 .map(PetMapper::toResponseDTO)
                 .toList();
     }
-    public List<PetResponseDTO> searchPetsBySpecie(String specie) {
-        SpecieEnum specieEnum;
-        try {
-            specieEnum = SpecieEnum.valueOf(specie.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Espécie inválida. Use GATO ou CACHORRO.");
-        }
-
-        return petRepository.findByRace_Specie(specieEnum)
+    public List<RacaResponseDTO> listarPorSpecie(SpecieEnum specie) {
+        return racaRepository.findBySpecie(specie)
                 .stream()
-                .map(this::toResponseDTO)
+                .map(this::toRacaResponseDTO)
                 .toList();
+    }
+    private RacaResponseDTO toRacaResponseDTO(RacaEntity entity) {
+        return new RacaResponseDTO(
+                entity.getIdRace(),
+                entity.getNameRace(),
+                entity.getSpecie()
+        );
     }
 
     private PetResponseDTO toResponseDTO(PetEntity pet) {

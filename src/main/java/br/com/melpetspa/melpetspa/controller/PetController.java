@@ -2,7 +2,7 @@ package br.com.melpetspa.melpetspa.controller;
 
 import br.com.melpetspa.melpetspa.dto.CreatePetRequestDTO;
 import br.com.melpetspa.melpetspa.dto.PetResponseDTO;
-import br.com.melpetspa.melpetspa.entity.RacaEntity;
+import br.com.melpetspa.melpetspa.dto.RacaResponseDTO;
 import br.com.melpetspa.melpetspa.entity.enums.SpecieEnum;
 import br.com.melpetspa.melpetspa.repository.PetRepository;
 import br.com.melpetspa.melpetspa.service.PetService;
@@ -30,10 +30,10 @@ public class PetController {
         return ResponseEntity.ok(pets);
     }
     @GetMapping("/search-by-specie")
-    public ResponseEntity<List<PetResponseDTO>> searchPetsBySpecie(
+    public ResponseEntity<List<RacaResponseDTO>> searchPetsBySpecie(
             @RequestParam(name = "specie") String specie) {
 
-        List<PetResponseDTO> pets = petService.searchPetsBySpecie(specie.toUpperCase());
+        List<RacaResponseDTO> pets = petService.listarPorSpecie(SpecieEnum.valueOf(specie.toUpperCase()));
         return ResponseEntity.ok(pets);
     }
     @GetMapping
