@@ -11,11 +11,10 @@ import lombok.*;
 @Entity
 public class RacaEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idRaca;
+    @Column(name = "id_raca")
+    private Integer idRace;
     @JoinColumn(name = "name_race")
     private String nameRace;
-
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private SpecieEnum especie;
+    private SpecieEnum specie;
 }

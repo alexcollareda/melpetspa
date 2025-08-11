@@ -8,5 +8,4 @@ import java.util.List;
 
 @Repository
 public interface RacaRepository extends JpaRepository<RacaEntity, Integer> {
-    List<RacaEntity> findByEspecie(String especie);
 }

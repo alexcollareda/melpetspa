@@ -20,11 +20,12 @@ public class PetEntity {
 
     private String nomePet;
     private String nomeTutor;
-    private LocalDateTime dataHoraInclusao;
 
     @ManyToOne
+    @JoinColumn(name = "id_raca")
     private RacaEntity race;
 
-    private SpecieEnum especie;
+    @Enumerated(EnumType.STRING)
+    private SpecieEnum specie;
 
 }
