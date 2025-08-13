@@ -31,15 +31,5 @@ public class CheckInController {
     public CheckInResponseDTO end(@RequestBody EndJobRequestDTO endJobRequestDTO) {
         return service.finalizarTrabalho(endJobRequestDTO);
     }
-
-    @GetMapping("/hoje")
-    public List<CheckInResponseDTO> listToDay() {
-        return service.listarCheckinsHoje();
-    }
-
-    @GetMapping("/buscar")
-    public List<CheckInResponseDTO> search(@RequestParam String data) {
-        return service.buscarPorData(data);
-    }
 }
 

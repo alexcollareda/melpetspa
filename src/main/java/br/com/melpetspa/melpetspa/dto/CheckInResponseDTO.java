@@ -14,10 +14,10 @@ import java.util.List;
 public class CheckInResponseDTO {
     private Long idCheckin;
 
-    private Long petId;
+    private Long idPet;
     private String petNome;
-    private String petNomeTutor;
-    private Integer racaId;
+    private String nomeTutor;
+    private Integer idRaca;
     private String racaNome;
     private String racaEspecie;
 

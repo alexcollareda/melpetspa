@@ -1,19 +1,27 @@
 package br.com.melpetspa.melpetspa.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateCheckInRequestDTO {
-
+    @NotNull
     private Long idPet;
-    private List<Integer> idServicos;
-    private boolean isColocaEnfeite;
-    private boolean isPassaPerfume;
-    private String priority;
+
+    @NotEmpty
+    private List<Integer> idServicos; // Integer, igual ao @Id do serviço
+
+    @JsonProperty("colocaEnfeite")
+    private boolean colocaEnfeite;
+
+    @JsonProperty("passaPerfume")
+    private boolean passaPerfume;
+
+    private String priority;   // envie "ALTA" | "MEDIA" | "BAIXA"
     private String observacoes;
 }

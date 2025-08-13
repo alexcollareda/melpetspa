@@ -20,7 +20,7 @@ public class PetController {
     private final PetService petService;
     private final PetRepository petRepository;
 
-    @PostMapping
+    @PostMapping("/create")
     public PetResponseDTO criarPet(@RequestBody @Valid CreatePetRequestDTO createPetRequestDTO) {
         return petService.criarPet(createPetRequestDTO);
     }
