@@ -17,35 +17,52 @@ import java.util.List;
 @Builder
 @Entity
 public class CheckInPetEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idCheckin;
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(name = "id_checkin")
+        private Long idCheckin;
 
     @ManyToOne(optional = false)
     private PetEntity pet;
-    @Column(name = "nome_tutor")
-    private String nomeTutor;
 
-    @ManyToMany
-    @JoinTable(
-            name = "checkin_servico",
-            joinColumns = @JoinColumn(name = "checkin_id"),
-            inverseJoinColumns = @JoinColumn(
-                    name = "servico_id",
-                    referencedColumnName = "id_servico" // <- referencia certa
-            )
-    )
-    private List<ServiceEntity> servicos = new ArrayList<>();
+        @Column(name = "nome_tutor")
+        private String nomeTutor;
 
+        @ManyToMany
+        @JoinTable(
+                name = "checkin_servico",
+                joinColumns = @JoinColumn(name = "checkin_id", referencedColumnName = "id_checkin"),
+                inverseJoinColumns = @JoinColumn(name = "servico_id", referencedColumnName = "id_servico")
+        )
+        private List<ServiceEntity> servicos = new ArrayList<>();
+
+    @Column(name = "is_coloca_enfeite", nullable = false)
     private boolean isColocaEnfeite;
-    private boolean isPassaPerfume;
-    private String priority;
-    private String observacoes;
 
-    @ManyToOne
+    @Column(name = "is_passa_perfume", nullable = false)
+    private boolean isPassaPerfume;
+
+    @Column(name = "priority")
+        private String priority;
+
+        @Column(name = "observacoes")
+        private String observacoes;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_groomer")
     private GroomerEntity groomer;
 
-    @Enumerated(EnumType.STRING)
-    private StatusCheckInEnum status;
+        @Column(name = "data_hora_criacao")
+        private LocalDateTime dataHoraCriacao;
 
+        @Column(name = "data_hora_alteracao")
+        private LocalDateTime dataHoraAlteracao;
+
+        @Column(name = "data_hora_finalizacao")
+        private LocalDateTime dataHoraFinalizacao;
+
+        @Enumerated(EnumType.STRING)
+        @Column(name = "status")
+        private StatusCheckInEnum status;
 }

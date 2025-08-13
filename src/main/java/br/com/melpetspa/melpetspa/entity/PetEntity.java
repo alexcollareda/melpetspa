@@ -26,7 +26,7 @@ public class PetEntity {
     private RacaEntity race;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "specie", nullable = false) // se quiser obrigatório
+    @Column(name = "specie", nullable = false)
     private SpecieEnum specie;
 
 }

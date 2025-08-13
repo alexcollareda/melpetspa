@@ -16,7 +16,7 @@ import static java.util.stream.Collectors.toList;
 @RestController
 @RequestMapping("/api/servicos")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173") // opcional p/ o front
+@CrossOrigin(origins = "http://localhost:5173")
 public class ServiceController {
 
     private final ServiceRepository serviceRepository;
