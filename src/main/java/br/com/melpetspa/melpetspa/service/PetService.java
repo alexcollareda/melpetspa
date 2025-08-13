@@ -26,6 +26,7 @@ public class PetService {
         pet.setNomePet(createPetRequestDTO.getNomePet());
         pet.setNomeTutor(createPetRequestDTO.getNomeTutor());
         pet.setRace(racaRepository.findById(Long.valueOf(createPetRequestDTO.getIdRaca())).orElseThrow());
+        pet.setSpecie(createPetRequestDTO.getSpecie());
         return toResponseDTO(petRepository.save(pet));
     }
     public List<PetResponseDTO> searchPetsByName(String nomePet) {
@@ -49,13 +50,14 @@ public class PetService {
     }
 
     private PetResponseDTO toResponseDTO(PetEntity pet) {
-        PetResponseDTO petResponseDTO = new PetResponseDTO();
-        petResponseDTO.setIdPet(pet.getIdPet());
-        petResponseDTO.setNomePet(pet.getNomePet());
-        petResponseDTO.setIdRaca(pet.getRace().getIdRace());
-        petResponseDTO.setNomeRaca(pet.getRace().getNameRace());
-        petResponseDTO.setSpecie(pet.getRace().getSpecie());
-        return petResponseDTO;
+        PetResponseDTO dto = new PetResponseDTO();
+        dto.setIdPet(pet.getIdPet());
+        dto.setNomePet(pet.getNomePet());
+        dto.setNomeTutor(pet.getNomeTutor());
+        dto.setIdRaca(pet.getRace().getIdRace());
+        dto.setNomeRaca(pet.getRace().getNameRace());
+        dto.setSpecie(pet.getRace().getSpecie());
+        return dto;
     }
 
 }

@@ -9,5 +9,4 @@ import java.util.List;
 
 @Repository
 public interface CheckInPetRepository extends JpaRepository<CheckInPetEntity, Long> {
-    List<CheckInPetEntity> findAllByDataHoraCriacaoBetween(LocalDateTime start, LocalDateTime end);
 }
