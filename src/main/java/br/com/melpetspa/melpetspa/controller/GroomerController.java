@@ -4,6 +4,7 @@ import br.com.melpetspa.melpetspa.dto.GroomerResponseDTO;
 import br.com.melpetspa.melpetspa.repository.GroomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,7 @@ import static java.util.stream.Collectors.toList;
 @RestController
 @RequestMapping("/api/groomers")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:5173/")
 public class GroomerController {
 
     private final GroomerRepository groomerRepository;

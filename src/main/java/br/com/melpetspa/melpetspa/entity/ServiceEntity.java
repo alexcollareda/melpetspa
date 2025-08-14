@@ -15,9 +15,9 @@ import lombok.NoArgsConstructor;
 public class ServiceEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_servico")           // <-- PK esperada pela FK
+    @Column(name = "id_servico")
     private Integer idService;
 
-    @Column(name = "nome_servico")         // ajuste se seu nome for diferente
+    @Column(name = "nome_servico")
     private String nomeService;
 }

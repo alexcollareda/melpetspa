@@ -14,7 +14,7 @@ public class CreateCheckInRequestDTO {
     private Long idPet;
 
     @NotEmpty
-    private List<Integer> idServicos; // Integer, igual ao @Id do serviço
+    private List<Integer> idServicos;
 
     @JsonProperty("colocaEnfeite")
     private boolean colocaEnfeite;
@@ -22,6 +22,6 @@ public class CreateCheckInRequestDTO {
     @JsonProperty("passaPerfume")
     private boolean passaPerfume;
 
-    private String priority;   // envie "ALTA" | "MEDIA" | "BAIXA"
+    private String priority;
     private String observacoes;
 }

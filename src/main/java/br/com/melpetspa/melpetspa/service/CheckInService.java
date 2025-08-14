@@ -1,10 +1,7 @@
+// br/com/melpetspa/melpetspa/service/CheckInService.java
 package br.com.melpetspa.melpetspa.service;
 
-import br.com.melpetspa.melpetspa.dto.CheckInResponseDTO;
-import br.com.melpetspa.melpetspa.dto.CreateCheckInRequestDTO;
-import br.com.melpetspa.melpetspa.dto.EndJobRequestDTO;
-import br.com.melpetspa.melpetspa.dto.ServiceResponseDTO;
-import br.com.melpetspa.melpetspa.dto.StartJobRequestDTO;
+import br.com.melpetspa.melpetspa.dto.*;
 import br.com.melpetspa.melpetspa.entity.CheckInPetEntity;
 import br.com.melpetspa.melpetspa.entity.ServiceEntity;
 import br.com.melpetspa.melpetspa.entity.enums.StatusCheckInEnum;
@@ -39,25 +36,18 @@ public class CheckInService {
         log.info("Criando check-in: pet={}, servicos={}, priority={}",
                 dto.getIdPet(), dto.getIdServicos(), dto.getPriority());
 
-        if (dto.getIdPet() == null) {
-            throw new IllegalArgumentException("idPet é obrigatório.");
-        }
-        if (dto.getIdServicos() == null || dto.getIdServicos().isEmpty()) {
+        if (dto.getIdPet() == null) throw new IllegalArgumentException("idPet é obrigatório.");
+        if (dto.getIdServicos() == null || dto.getIdServicos().isEmpty())
             throw new IllegalArgumentException("Selecione ao menos um serviço.");
-        }
 
         var pet = petRepository.findById(dto.getIdPet())
                 .orElseThrow(() -> new IllegalArgumentException("Pet não encontrado: " + dto.getIdPet()));
 
-        // Busca serviços e confere se todos existem
-        List<Integer> idsSolicitados = dto.getIdServicos();
-        var servicos = servicoRepository.findAllById(idsSolicitados);
-
-        if (servicos.size() != idsSolicitados.size()) {
-            Set<Integer> encontrados = new HashSet<>(
-                    servicos.stream().map(ServiceEntity::getIdService).toList());
-            var faltando = idsSolicitados.stream()
-                    .filter(id -> !encontrados.contains(id)).toList();
+        List<Integer> ids = dto.getIdServicos();
+        var servicos = servicoRepository.findAllById(ids);
+        if (servicos.size() != ids.size()) {
+            Set<Integer> ok = new HashSet<>(servicos.stream().map(ServiceEntity::getIdService).toList());
+            var faltando = ids.stream().filter(i -> !ok.contains(i)).toList();
             throw new IllegalArgumentException("Serviços inexistentes: " + faltando);
         }
 
@@ -68,77 +58,91 @@ public class CheckInService {
         checkin.setPassaPerfume(dto.isPassaPerfume());
         checkin.setPriority(dto.getPriority() != null ? dto.getPriority().toUpperCase() : null);
         checkin.setObservacoes(dto.getObservacoes());
+        checkin.setDataHoraCriacao(LocalDateTime.now());
         checkin.setStatus(StatusCheckInEnum.AGUARDANDO);
 
-        var salvo = checkInPetRepository.saveAndFlush(checkin);
-        return toDTO(salvo);
+        return toDTO(checkInPetRepository.saveAndFlush(checkin));
     }
 
     @Transactional
     public CheckInResponseDTO iniciarTrabalho(StartJobRequestDTO dto) {
-        if (dto.getIdCheckIn() == null || dto.getIdGroomer() == null) {
+        if (dto.getIdCheckIn() == null || dto.getIdGroomer() == null)
             throw new IllegalArgumentException("idCheckIn e idGroomer são obrigatórios.");
-        }
 
         var checkin = checkInPetRepository.findById(dto.getIdCheckIn())
                 .orElseThrow(() -> new IllegalArgumentException("Check-in não encontrado: " + dto.getIdCheckIn()));
 
-        if (checkin.getStatus() != StatusCheckInEnum.AGUARDANDO) {
+        if (checkin.getStatus() != StatusCheckInEnum.AGUARDANDO)
             throw new IllegalStateException("Só é possível iniciar check-ins em AGUARDANDO.");
-        }
 
         var groomer = groomerRepository.findById(dto.getIdGroomer())
                 .orElseThrow(() -> new IllegalArgumentException("Groomer não encontrado: " + dto.getIdGroomer()));
 
         checkin.setGroomer(groomer);
         checkin.setStatus(StatusCheckInEnum.INICIADO);
+        checkin.setDataHoraAlteracao(LocalDateTime.now());
 
-        var salvo = checkInPetRepository.saveAndFlush(checkin);
-        return toDTO(salvo);
+        return toDTO(checkInPetRepository.saveAndFlush(checkin));
     }
 
     @Transactional
     public CheckInResponseDTO finalizarTrabalho(EndJobRequestDTO dto) {
-        if (dto.getIdCheckIn() == null) {
-            throw new IllegalArgumentException("idCheckIn é obrigatório.");
-        }
+        if (dto.getIdCheckIn() == null) throw new IllegalArgumentException("idCheckIn é obrigatório.");
 
         var checkin = checkInPetRepository.findById(dto.getIdCheckIn())
                 .orElseThrow(() -> new IllegalArgumentException("Check-in não encontrado: " + dto.getIdCheckIn()));
 
-        if (checkin.getStatus() != StatusCheckInEnum.INICIADO) {
+        if (checkin.getStatus() != StatusCheckInEnum.INICIADO)
             throw new IllegalStateException("Só é possível finalizar check-ins em INICIADO.");
-        }
 
         checkin.setStatus(StatusCheckInEnum.FINALIZADO);
+        checkin.setDataHoraFinalizacao(LocalDateTime.now());
 
-        var salvo = checkInPetRepository.saveAndFlush(checkin);
-        return toDTO(salvo);
+        return toDTO(checkInPetRepository.saveAndFlush(checkin));
+    }
+
+    @Transactional(readOnly = true)
+    public List<CheckInResponseDTO> listarCheckinsHoje() {
+        LocalDateTime start = LocalDate.now().atStartOfDay();
+        LocalDateTime end = start.plusDays(1);
+        return checkInPetRepository.findAllByDataHoraCriacaoBetween(start, end)
+                .stream().map(this::toDTO).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<CheckInResponseDTO> buscarPorData(String data) {
+        if (data == null || data.isBlank())
+            throw new IllegalArgumentException("Parâmetro 'data' é obrigatório (formato dd/MM/yyyy).");
+
+        LocalDate d;
+        try {
+            d = LocalDate.parse(data, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Data inválida. Use o formato dd/MM/yyyy.");
+        }
+        LocalDateTime start = d.atStartOfDay();
+        LocalDateTime end = start.plusDays(1);
+
+        return checkInPetRepository.findAllByDataHoraCriacaoBetween(start, end)
+                .stream().map(this::toDTO).toList();
     }
 
     private CheckInResponseDTO toDTO(CheckInPetEntity e) {
         var dto = new CheckInResponseDTO();
-
         dto.setIdCheckin(e.getIdCheckin());
 
-        // Pet
         if (e.getPet() != null) {
             dto.setIdPet(e.getPet().getIdPet());
             dto.setPetNome(e.getPet().getNomePet());
             dto.setNomeTutor(e.getPet().getNomeTutor());
-
             if (e.getPet().getRace() != null) {
                 dto.setIdRaca(e.getPet().getRace().getIdRace());
                 dto.setRacaNome(e.getPet().getRace().getNameRace());
-                dto.setRacaEspecie(
-                        e.getPet().getRace().getSpecie() != null
-                                ? e.getPet().getRace().getSpecie().name()
-                                : null
-                );
+                dto.setRacaEspecie(e.getPet().getRace().getSpecie() != null
+                        ? e.getPet().getRace().getSpecie().name() : null);
             }
         }
 
-        // Serviços -> seu ServiceResponseDTO tem (idService, nomeService)
         if (e.getServicos() != null && !e.getServicos().isEmpty()) {
             dto.setServicos(
                     e.getServicos().stream()
@@ -147,20 +151,19 @@ public class CheckInService {
             );
         }
 
-        // Flags e observações
         dto.setColocaEnfeite(e.isColocaEnfeite());
         dto.setPassaPerfume(e.isPassaPerfume());
         dto.setPriority(e.getPriority());
         dto.setObservacoes(e.getObservacoes());
 
-        // Groomer (pode ser nulo)
         if (e.getGroomer() != null) {
             dto.setGroomerId(e.getGroomer().getIdGroomer());
-            // ajuste conforme sua entidade: getNomeGroomer() ou getName()
             dto.setGroomerNome(e.getGroomer().getNomeGroomer());
         }
 
-        // Datas e status
+        dto.setDataHoraCriacao(e.getDataHoraCriacao());
+        dto.setDataHoraAlteracao(e.getDataHoraAlteracao());
+        dto.setDataHoraFinalizacao(e.getDataHoraFinalizacao());
         dto.setStatus(e.getStatus());
 
         return dto;
