@@ -1,4 +1,4 @@
-INSERT INTO race_entity (name, species, order_position) VALUES
+INSERT INTO race_entity (species, name_race) VALUES
     ('Labrador Retriever', 'DOG', 1),
     ('Shih Tzu', 'DOG', 2),
     ('Bulldog Francês', 'DOG', 3),

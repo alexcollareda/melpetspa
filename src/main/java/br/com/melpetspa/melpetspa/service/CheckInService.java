@@ -111,20 +111,37 @@ public class CheckInService {
 
     @Transactional(readOnly = true)
     public List<CheckInResponseDTO> buscarPorData(String data) {
-        if (data == null || data.isBlank())
-            throw new IllegalArgumentException("Parâmetro 'data' é obrigatório (formato dd/MM/yyyy).");
-
-        LocalDate d;
-        try {
-            d = LocalDate.parse(data, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Data inválida. Use o formato dd/MM/yyyy.");
+        if (data == null || data.isBlank()) {
+            // opcional: default para hoje
+            LocalDate hoje = LocalDate.now();
+            return buscarEntre(hoje.atStartOfDay(), hoje.plusDays(1).atStartOfDay());
         }
+
+        LocalDate d = parseDataFlex(data); // aceita dd/MM/yyyy ou yyyy-MM-dd
         LocalDateTime start = d.atStartOfDay();
         LocalDateTime end = start.plusDays(1);
 
+        return buscarEntre(start, end);
+    }
+
+    private List<CheckInResponseDTO> buscarEntre(LocalDateTime start, LocalDateTime end) {
         return checkInPetRepository.findAllByDataHoraCriacaoBetween(start, end)
-                .stream().map(this::toDTO).toList();
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    private LocalDate parseDataFlex(String texto) {
+        List<DateTimeFormatter> formatos = List.of(
+                DateTimeFormatter.ofPattern("dd/MM/yyyy"),
+                DateTimeFormatter.ISO_LOCAL_DATE // yyyy-MM-dd
+        );
+        for (DateTimeFormatter f : formatos) {
+            try {
+                return LocalDate.parse(texto, f);
+            } catch (Exception ignored) { }
+        }
+        throw new IllegalArgumentException("Data inválida. Use dd/MM/yyyy ou yyyy-MM-dd.");
     }
 
     private CheckInResponseDTO toDTO(CheckInPetEntity e) {
