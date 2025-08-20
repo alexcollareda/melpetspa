@@ -28,7 +28,7 @@ public class CheckInService {
 
     private final CheckInPetRepository checkInPetRepository;
     private final PetRepository petRepository;
-    private final ServiceRepository servicoRepository;
+    private final ServiceRepository serviceRepository;
     private final GroomerRepository groomerRepository;
 
     @Transactional
@@ -44,7 +44,7 @@ public class CheckInService {
                 .orElseThrow(() -> new IllegalArgumentException("Pet não encontrado: " + dto.getIdPet()));
 
         List<Integer> ids = dto.getIdServicos();
-        var servicos = servicoRepository.findAllById(ids);
+        var servicos = serviceRepository.findAllById(ids);
         if (servicos.size() != ids.size()) {
             Set<Integer> ok = new HashSet<>(servicos.stream().map(ServiceEntity::getIdService).toList());
             var faltando = ids.stream().filter(i -> !ok.contains(i)).toList();
@@ -144,6 +144,36 @@ public class CheckInService {
         throw new IllegalArgumentException("Data inválida. Use dd/MM/yyyy ou yyyy-MM-dd.");
     }
 
+    @Transactional
+    public CheckInResponseDTO editar(Long id, UpdateCheckInRequestDTO dto) {
+        var entity = checkInPetRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Check-in não encontrado."));
+
+        // só do dia
+        LocalDate hoje = LocalDate.now();
+        if (entity.getDataHoraCriacao() == null ||
+                !entity.getDataHoraCriacao().toLocalDate().isEqual(hoje)) {
+            throw new IllegalStateException("Só é permitido editar check-ins do dia atual.");
+        }
+
+        // serviços
+        if (dto.getIdServicos() != null) {
+            var servicos = serviceRepository.findAllById(dto.getIdServicos());
+            entity.setServicos(servicos);
+        }
+
+        if (dto.getPriority() != null) entity.setPriority(dto.getPriority());
+        if (dto.getColocaEnfeite() != null) entity.setColocaEnfeite(dto.getColocaEnfeite());
+        if (dto.getPassaPerfume() != null) entity.setPassaPerfume(dto.getPassaPerfume());
+        if (dto.getObservacoes() != null) entity.setObservacoes(dto.getObservacoes());
+
+        entity.setAlterado(true); // marca a flag
+        entity.setDataHoraAlteracao(LocalDateTime.now());
+
+        var saved = checkInPetRepository.save(entity);
+        return toDTO(saved);
+    }
+
     private CheckInResponseDTO toDTO(CheckInPetEntity e) {
         var dto = new CheckInResponseDTO();
         dto.setIdCheckin(e.getIdCheckin());
@@ -182,6 +212,7 @@ public class CheckInService {
         dto.setDataHoraAlteracao(e.getDataHoraAlteracao());
         dto.setDataHoraFinalizacao(e.getDataHoraFinalizacao());
         dto.setStatus(e.getStatus());
+        dto.setAlterado(e.isAlterado());
 
         return dto;
     }

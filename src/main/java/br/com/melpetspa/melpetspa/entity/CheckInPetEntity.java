@@ -65,4 +65,8 @@ public class CheckInPetEntity {
         @Enumerated(EnumType.STRING)
         @Column(name = "status")
         private StatusCheckInEnum status;
+
+    @Column(name = "alterado", nullable = false)
+    private boolean alterado; // primitivo evita null
+
 }
