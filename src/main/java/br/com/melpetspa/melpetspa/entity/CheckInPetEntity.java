@@ -35,7 +35,7 @@ public class CheckInPetEntity {
                 joinColumns = @JoinColumn(name = "checkin_id", referencedColumnName = "id_checkin"),
                 inverseJoinColumns = @JoinColumn(name = "servico_id", referencedColumnName = "id_servico")
         )
-        private List<ServiceEntity> servicos = new ArrayList<>();
+        private List<ServiceEntity> servicos;
 
     @Column(name = "is_coloca_enfeite", nullable = false)
     private boolean isColocaEnfeite;

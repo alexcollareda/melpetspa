@@ -20,7 +20,11 @@ public class AppConfiguration {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5173")
+                        // ATENÇÃO: "*" permite qualquer origem. USE COM CAUTELA!
+                        // Altamente NÃO RECOMENDADO para ambientes de produção.
+                        // Para produção, liste explicitamente os domínios permitidos, ex:
+                        // .allowedOrigins("http://seu-frontend.com", "https://seu-frontend.com")
+                        .allowedOrigins("*")
                         .allowedMethods("*");
             }
         };
