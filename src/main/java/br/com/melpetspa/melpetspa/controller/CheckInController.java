@@ -1,10 +1,10 @@
 package br.com.melpetspa.melpetspa.controller;
 
 import br.com.melpetspa.melpetspa.dto.*;
+import br.com.melpetspa.melpetspa.repository.CheckInPetRepository;
 import br.com.melpetspa.melpetspa.service.CheckInService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
 import jakarta.validation.Valid;
 import java.util.List;
 
@@ -40,4 +40,11 @@ public class CheckInController {
     public List<CheckInResponseDTO> buscarPorData(@RequestParam String data) {
         return service.buscarPorData(data);
     }
+    @PutMapping("/{id}/editar")
+    public CheckInResponseDTO editar(
+            @PathVariable Long id,
+            @RequestBody UpdateCheckInRequestDTO updateCheckInRequestDTO) {
+        return service.editar(id, updateCheckInRequestDTO);
+    }
+
 }

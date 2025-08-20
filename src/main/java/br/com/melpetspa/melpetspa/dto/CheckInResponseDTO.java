@@ -36,4 +36,6 @@ public class CheckInResponseDTO {
     private LocalDateTime dataHoraFinalizacao;
 
     private StatusCheckInEnum status;
+
+    private boolean alterado;
 }
