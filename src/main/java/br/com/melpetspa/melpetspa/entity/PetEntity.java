@@ -29,4 +29,7 @@ public class PetEntity {
     @Column(name = "specie", nullable = false)
     private SpecieEnum specie;
 
+    @Column
+    private String photoUrl;
+
 }

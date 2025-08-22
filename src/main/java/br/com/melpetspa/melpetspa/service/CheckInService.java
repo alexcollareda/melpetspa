@@ -188,6 +188,7 @@ public class CheckInService {
                 dto.setRacaEspecie(e.getPet().getRace().getSpecie() != null
                         ? e.getPet().getRace().getSpecie().name() : null);
             }
+            dto.setPhotoUrl(e.getPet().getPhotoUrl());
         }
 
         if (e.getServicos() != null && !e.getServicos().isEmpty()) {
@@ -213,6 +214,7 @@ public class CheckInService {
         dto.setDataHoraFinalizacao(e.getDataHoraFinalizacao());
         dto.setStatus(e.getStatus());
         dto.setAlterado(e.isAlterado());
+
 
         return dto;
     }

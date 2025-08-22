@@ -38,4 +38,5 @@ public class CheckInResponseDTO {
     private StatusCheckInEnum status;
 
     private boolean alterado;
+    private String photoUrl;
 }

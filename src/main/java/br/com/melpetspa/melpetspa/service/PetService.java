@@ -3,17 +3,20 @@ package br.com.melpetspa.melpetspa.service;
 import br.com.melpetspa.melpetspa.dto.CreatePetRequestDTO;
 import br.com.melpetspa.melpetspa.dto.PetResponseDTO;
 import br.com.melpetspa.melpetspa.dto.RacaResponseDTO;
+import br.com.melpetspa.melpetspa.dto.UpdatePhotoRequest;
 import br.com.melpetspa.melpetspa.entity.PetEntity;
 import br.com.melpetspa.melpetspa.entity.RacaEntity;
 import br.com.melpetspa.melpetspa.entity.enums.SpecieEnum;
 import br.com.melpetspa.melpetspa.mapper.PetMapper;
 import br.com.melpetspa.melpetspa.repository.PetRepository;
 import br.com.melpetspa.melpetspa.repository.RacaRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -60,4 +63,11 @@ public class PetService {
         return dto;
     }
 
+    public void atualizarFotoPet(@Valid UpdatePhotoRequest updatePhotoRequest) {
+       Optional<PetEntity> pet =  petRepository.findById(updatePhotoRequest.getPetId());
+       if(pet.isPresent()){
+           pet.get().setPhotoUrl(updatePhotoRequest.getPhotoUrl());
+           petRepository.save(pet.get());
+       }
+    }
 }

@@ -14,4 +14,5 @@ public class CreatePetRequestDTO {
     private Integer idRaca;
     @Enumerated(EnumType.STRING)
     private SpecieEnum specie;
+    private String photoUrl;
 }

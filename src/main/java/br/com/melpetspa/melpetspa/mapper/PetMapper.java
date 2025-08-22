@@ -12,7 +12,8 @@ public class PetMapper {
                 entity.getNomeTutor(),
                 entity.getRace().getIdRace(),
                 entity.getRace().getNameRace(),
-                entity.getRace().getSpecie()
+                entity.getRace().getSpecie(),
+                entity.getPhotoUrl()
         );
     }
 }

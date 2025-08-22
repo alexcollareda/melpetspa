@@ -20,4 +20,5 @@ public class PetResponseDTO {
     private String nomeRaca;
     @Enumerated(EnumType.STRING)
     private SpecieEnum specie;
+    private String photoUrl;
 }
