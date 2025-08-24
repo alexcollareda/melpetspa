@@ -30,7 +30,9 @@ public class PetService {
         pet.setNomeTutor(createPetRequestDTO.getNomeTutor());
         pet.setRace(racaRepository.findById(Long.valueOf(createPetRequestDTO.getIdRaca())).orElseThrow());
         pet.setSpecie(createPetRequestDTO.getSpecie());
+        pet.setPhotoUrl(createPetRequestDTO.getPhotoUrl());
         return toResponseDTO(petRepository.save(pet));
+
     }
     public List<PetResponseDTO> searchPetsByName(String nomePet) {
         return petRepository.findByNomePetContainingIgnoreCase(nomePet)
@@ -60,6 +62,7 @@ public class PetService {
         dto.setIdRaca(pet.getRace().getIdRace());
         dto.setNomeRaca(pet.getRace().getNameRace());
         dto.setSpecie(pet.getRace().getSpecie());
+        dto.setPhotoUrl(pet.getPhotoUrl());
         return dto;
     }
 
