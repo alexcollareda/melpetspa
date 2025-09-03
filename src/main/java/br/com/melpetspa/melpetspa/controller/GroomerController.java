@@ -23,7 +23,7 @@ public class GroomerController {
 
     @GetMapping
     public ResponseEntity<List<GroomerResponseDTO>> listarGroomers() {
-        List<GroomerResponseDTO> response = groomerRepository.findAll()
+        List<GroomerResponseDTO> response = groomerRepository.findByAtivoTrue()
                 .stream()
                 .map(g -> new GroomerResponseDTO(g.getIdGroomer(), g.getNomeGroomer()))
                 .collect(toList());
