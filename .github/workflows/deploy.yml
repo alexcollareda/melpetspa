@@ -43,6 +43,7 @@ jobs:
           ECR_REPOSITORY: ${{ secrets.ECR_MELPETSPA_REPOSITORY }} # Nome do seu repositório ECR para o MelPetSpa
           IMAGE_TAG: ${{ github.sha }} # Usa o SHA do commit como tag da imagem para unicidade
         run: |
+          # ESTA LINHA IRÁ CONSTRUIR A IMAGEM COM O HEALTHCHECK DO SEU Dockerfile
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . # Constrói a imagem Docker
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG # Envia a imagem para o ECR
 
@@ -79,6 +80,7 @@ jobs:
             
             echo "Iniciando novo contêiner '${DOCKER_CONTAINER_NAME}'..."
             # Inicia o novo contêiner do MelPetSpa
+            # O health check definido no Dockerfile será automaticamente usado pelo Docker
             docker run -d \
               --restart always \
               --name ${DOCKER_CONTAINER_NAME} \
