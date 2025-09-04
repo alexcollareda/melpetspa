@@ -1,0 +1,95 @@
+name: Deploy para EC2 com Docker # Nome do fluxo de trabalho
+
+on:
+  push:
+    branches:
+      - main # O deploy será acionado a cada push para a branch 'main'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest # O runner do GitHub Actions será um ambiente Ubuntu
+
+    steps:
+      - name: Fazer checkout do código # Passo 1: Clona o código do seu repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar JDK 21 # Passo 2: Configura o ambiente Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle' # Ativa o cache do Gradle para builds mais rápidos
+
+      - name: Conceder permissão de execução para gradlew # Passo 3: Concede permissão de execução ao script gradlew
+        run: chmod +x gradlew
+
+      - name: Compilar com Gradle # Passo 4: Compila a aplicação Spring Boot
+        run: ./gradlew clean build -x test # '-x test' pula a execução dos testes para agilizar o deploy
+
+      - name: Configurar credenciais da AWS # Passo 5: Configura as credenciais AWS para o runner
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} # Pega do GitHub Secrets
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # Pega do GitHub Secrets
+          aws-region: ${{ secrets.AWS_REGION }} # Pega do GitHub Secrets
+
+      - name: Fazer login no Amazon ECR # Passo 6: Realiza o login no ECR
+        id: login-ecr # Define um ID para este passo, para referenciar suas saídas
+        uses: aws-actions/amazon-ecr-login@v2 # Action que gerencia o login no ECR
+
+      - name: Construir, taguear e enviar imagem para o Amazon ECR # Passo 7: Constrói, tagueia e envia a imagem para o ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }} # URI do registry ECR
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }} # Nome do seu repositório ECR
+          IMAGE_TAG: ${{ github.sha }} # Usa o SHA do commit como tag da imagem para unicidade
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . # Constrói a imagem Docker
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG # Envia a imagem para o ECR
+
+      - name: Fazer deploy para EC2 via SSH # Passo 8: Conecta-se à instância EC2 e executa comandos de deploy
+        uses: appleboy/ssh-action@v1.0.3 # Action para executar comandos via SSH
+        with:
+          host: ${{ secrets.EC2_HOST }} # IP/DNS da instância EC2
+          username: ${{ secrets.EC2_USER }} # Nome de usuário SSH
+          key: ${{ secrets.EC2_SSH_KEY }} # Chave privada SSH
+          script: | # Comandos a serem executados na instância EC2
+            # Variáveis para o script na instância EC2
+            REPO_NAME=${{ secrets.ECR_REPOSITORY }}
+            IMAGE_TAG=${{ github.sha }}
+            AWS_REGION=${{ secrets.AWS_REGION }}
+            # Obtém o Account ID da AWS dinamicamente na instância EC2
+            AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+            ECR_REGISTRY_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
+            
+            echo "Parando o contêiner existente (se houver)..."
+            docker stop ${REPO_NAME} || true # Para o contêiner se estiver rodando, ignora erros se não
+            docker rm ${REPO_NAME} || true # Remove o contêiner se existir, ignora erros se não
+            
+            echo "Fazendo login no ECR na EC2..."
+            # Realiza o login no ECR usando o AWS CLI (que usa o Perfil do IAM da instância)
+            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY_URI
+            
+            echo "Puxando nova imagem: $ECR_REGISTRY_URI/$REPO_NAME:$IMAGE_TAG"
+            docker pull $ECR_REGISTRY_URI/$REPO_NAME:$IMAGE_TAG # Puxa a nova imagem do ECR
+            
+            echo "Iniciando novo contêiner..."
+            # Inicia o novo contêiner
+            # -d: roda em background
+            # --restart always: reinicia automaticamente se o Docker for reiniciado ou o contêiner falhar
+            # --name: define o nome do contêiner para fácil gerenciamento
+            # -p 8081:8081: mapeia a porta 8081 do host para a porta 8081 do contêiner
+            docker run -d \
+              --restart always \
+              --name ${REPO_NAME} \
+              -p 8081:8081 \
+              -e SPRING_PROFILES_ACTIVE=prod \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+              -e AWS_REGION=${{ secrets.AWS_REGION }} \
+              -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+              $ECR_REGISTRY_URI/$REPO_NAME:$IMAGE_TAG
+            
+            echo "Limpando imagens antigas (opcional, para economizar espaço em disco)..."
+            docker image prune -f # Remove imagens Docker não utilizadas
+            
+            echo "Deploy concluído."
