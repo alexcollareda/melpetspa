@@ -1,16 +1,16 @@
-name: Deploy para EC2 com Docker # Nome do fluxo de trabalho
+name: Deploy MelPetSpa para EC2 com Docker # Nome do fluxo de trabalho - ESPECÍFICO PARA MELPETSPA
 
 on:
   push:
     branches:
-      - main # O deploy será acionado a cada push para a branch 'main'
+      - main # O deploy será acionado a cada push para a branch 'main' do repositório MelPetSpa
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest # O runner do GitHub Actions será um ambiente Ubuntu
 
     steps:
-      - name: Fazer checkout do código # Passo 1: Clona o código do seu repositório
+      - name: Fazer checkout do código # Passo 1: Clona o código do seu repositório MelPetSpa
         uses: actions/checkout@v4
 
       - name: Configurar JDK 21 # Passo 2: Configura o ambiente Java 21
@@ -23,7 +23,7 @@ jobs:
       - name: Conceder permissão de execução para gradlew # Passo 3: Concede permissão de execução ao script gradlew
         run: chmod +x gradlew
 
-      - name: Compilar com Gradle # Passo 4: Compila a aplicação Spring Boot
+      - name: Compilar com Gradle # Passo 4: Compila a aplicação Spring Boot do MelPetSpa
         run: ./gradlew clean build -x test # '-x test' pula a execução dos testes para agilizar o deploy
 
       - name: Configurar credenciais da AWS # Passo 5: Configura as credenciais AWS para o runner
@@ -40,7 +40,7 @@ jobs:
       - name: Construir, taguear e enviar imagem para o Amazon ECR # Passo 7: Constrói, tagueia e envia a imagem para o ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }} # URI do registry ECR
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }} # Nome do seu repositório ECR
+          ECR_REPOSITORY: ${{ secrets.ECR_MELPETSPA_REPOSITORY }} # Nome do seu repositório ECR para o MelPetSpa
           IMAGE_TAG: ${{ github.sha }} # Usa o SHA do commit como tag da imagem para unicidade
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . # Constrói a imagem Docker
@@ -53,42 +53,44 @@ jobs:
           username: ${{ secrets.EC2_USER }} # Nome de usuário SSH
           key: ${{ secrets.EC2_SSH_KEY }} # Chave privada SSH
           script: | # Comandos a serem executados na instância EC2
-            # Variáveis para o script na instância EC2
-            REPO_NAME=${{ secrets.ECR_REPOSITORY }}
-            IMAGE_TAG=${{ github.sha }}
-            AWS_REGION=${{ secrets.AWS_REGION }}
+            # Variáveis específicas para o deploy do MelPetSpa na instância EC2
+            ECR_REPO_NAME="${{ secrets.ECR_MELPETSPA_REPOSITORY }}" # Nome do repositório no ECR para o MelPetSpa
+            DOCKER_CONTAINER_NAME="melpetspa-app" # Nome único e fixo para o contêiner do MelPetSpa
+            HOST_PORT="8081" # Porta no host EC2 para o MelPetSpa (DIFERENTE DO AUTOSAFE)
+            CONTAINER_PORT="8081" # Porta interna do contêiner do MelPetSpa (conforme seu exemplo)
+
+            IMAGE_TAG="${{ github.sha }}"
+            AWS_REGION="${{ secrets.AWS_REGION }}"
+
             # Obtém o Account ID da AWS dinamicamente na instância EC2
             AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
             ECR_REGISTRY_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
             
-            echo "Parando o contêiner existente (se houver)..."
-            docker stop ${REPO_NAME} || true # Para o contêiner se estiver rodando, ignora erros se não
-            docker rm ${REPO_NAME} || true # Remove o contêiner se existir, ignora erros se não
+            echo "Parando o contêiner existente '${DOCKER_CONTAINER_NAME}' (se houver)..."
+            docker stop ${DOCKER_CONTAINER_NAME} || true # Para o contêiner MelPetSpa
+            docker rm ${DOCKER_CONTAINER_NAME} || true # Remove o contêiner MelPetSpa
             
             echo "Fazendo login no ECR na EC2..."
             # Realiza o login no ECR usando o AWS CLI (que usa o Perfil do IAM da instância)
             aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY_URI
             
-            echo "Puxando nova imagem: $ECR_REGISTRY_URI/$REPO_NAME:$IMAGE_TAG"
-            docker pull $ECR_REGISTRY_URI/$REPO_NAME:$IMAGE_TAG # Puxa a nova imagem do ECR
+            echo "Puxando nova imagem: $ECR_REGISTRY_URI/$ECR_REPO_NAME:$IMAGE_TAG"
+            docker pull $ECR_REGISTRY_URI/$ECR_REPO_NAME:$IMAGE_TAG # Puxa a nova imagem do MelPetSpa
             
-            echo "Iniciando novo contêiner..."
-            # Inicia o novo contêiner
-            # -d: roda em background
-            # --restart always: reinicia automaticamente se o Docker for reiniciado ou o contêiner falhar
-            # --name: define o nome do contêiner para fácil gerenciamento
-            # -p 8081:8081: mapeia a porta 8081 do host para a porta 8081 do contêiner
+            echo "Iniciando novo contêiner '${DOCKER_CONTAINER_NAME}'..."
+            # Inicia o novo contêiner do MelPetSpa
             docker run -d \
               --restart always \
-              --name ${REPO_NAME} \
-              -p 8081:8081 \
-              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              -e AWS_S3_SECRET_ACCESS_KEY=${{ secrets.AWS_S3_SECRET_ACCESS_KEY }} \
+              --name ${DOCKER_CONTAINER_NAME} \
+              -p ${HOST_PORT}:${CONTAINER_PORT} \
+              -e SPRING_PROFILES_ACTIVE=prod \
+              -e DB_PASSWORD=${{ secrets.MELPETSPA_DB_PASSWORD }} \
+              -e AWS_S3_SECRET_ACCESS_KEY=${{ secrets.MELPETSPA_AWS_S3_SECRET_ACCESS_KEY }} \
               -e AWS_REGION=${{ secrets.AWS_REGION }} \
-              -e AWS_S3_ACCESS_KEY_ID=${{ secrets.AWS_S3_ACCESS_KEY_ID }} \
-              $ECR_REGISTRY_URI/$REPO_NAME:$IMAGE_TAG
+              -e AWS_S3_ACCESS_KEY_ID=${{ secrets.MELPETSPA_AWS_S3_ACCESS_KEY_ID }} \
+              $ECR_REGISTRY_URI/$ECR_REPO_NAME:$IMAGE_TAG
             
             echo "Limpando imagens antigas (opcional, para economizar espaço em disco)..."
             docker image prune -f # Remove imagens Docker não utilizadas
             
-            echo "Deploy concluído."
+            echo "Deploy do MelPetSpa concluído."
