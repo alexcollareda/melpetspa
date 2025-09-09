@@ -1,9 +1,6 @@
 package br.com.melpetspa.melpetspa.service;
 
-import br.com.melpetspa.melpetspa.dto.CreatePetRequestDTO;
-import br.com.melpetspa.melpetspa.dto.PetResponseDTO;
-import br.com.melpetspa.melpetspa.dto.RacaResponseDTO;
-import br.com.melpetspa.melpetspa.dto.UpdatePhotoRequest;
+import br.com.melpetspa.melpetspa.dto.*;
 import br.com.melpetspa.melpetspa.entity.PetEntity;
 import br.com.melpetspa.melpetspa.entity.RacaEntity;
 import br.com.melpetspa.melpetspa.entity.enums.SpecieEnum;
@@ -32,20 +29,22 @@ public class PetService {
         pet.setSpecie(createPetRequestDTO.getSpecie());
         pet.setPhotoUrl(createPetRequestDTO.getPhotoUrl());
         return toResponseDTO(petRepository.save(pet));
-
     }
+
     public List<PetResponseDTO> searchPetsByName(String nomePet) {
         return petRepository.findByNomePetContainingIgnoreCase(nomePet)
                 .stream()
                 .map(PetMapper::toResponseDTO)
                 .toList();
     }
+
     public List<RacaResponseDTO> listarPorSpecie(SpecieEnum specie) {
         return racaRepository.findBySpecie(specie)
                 .stream()
                 .map(this::toRacaResponseDTO)
                 .toList();
     }
+
     private RacaResponseDTO toRacaResponseDTO(RacaEntity entity) {
         return new RacaResponseDTO(
                 entity.getIdRace(),
@@ -63,6 +62,7 @@ public class PetService {
         dto.setNomeRaca(pet.getRace().getNameRace());
         dto.setSpecie(pet.getRace().getSpecie());
         dto.setPhotoUrl(pet.getPhotoUrl());
+        dto.setBirthDate(pet.getBirthDate());
         return dto;
     }
 
@@ -72,5 +72,24 @@ public class PetService {
            pet.get().setPhotoUrl(updatePhotoRequest.getPhotoUrl());
            petRepository.save(pet.get());
        }
+    }
+
+    public void atualizarPet(@Valid UpdatePetRequestDTO updatePetRequestDTO) {
+        Optional<PetEntity> pet =  petRepository.findById(updatePetRequestDTO.getIdPet());
+        if(pet.isPresent()){
+            pet.get().setNomePet(updatePetRequestDTO.getNomePet());
+            pet.get().setNomeTutor(updatePetRequestDTO.getNomeTutor());
+            pet.get().setRace(racaRepository.findById(Long.valueOf(updatePetRequestDTO.getIdRaca())).orElseThrow());
+            pet.get().setBirthDate(updatePetRequestDTO.getBirthDate());
+            petRepository.save(pet.get());
+        }
+
+    }
+
+    public List<PetResponseDTO> lisAlltPets() {
+        return petRepository.findAll()
+                .stream()
+                .map(this::toResponseDTO)
+                .toList();
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
@@ -58,7 +59,7 @@ public class CheckInService {
         checkin.setPassaPerfume(dto.isPassaPerfume());
         checkin.setPriority(dto.getPriority() != null ? dto.getPriority().toUpperCase() : null);
         checkin.setObservacoes(dto.getObservacoes());
-        checkin.setDataHoraCriacao(LocalDateTime.now());
+        checkin.setDataHoraCriacao(LocalDateTime.now(ZoneId.of("America/Cuiaba")));
         checkin.setStatus(StatusCheckInEnum.AGUARDANDO);
 
         return toDTO(checkInPetRepository.saveAndFlush(checkin));
@@ -80,7 +81,7 @@ public class CheckInService {
 
         checkin.setGroomer(groomer);
         checkin.setStatus(StatusCheckInEnum.INICIADO);
-        checkin.setDataHoraAlteracao(LocalDateTime.now());
+        checkin.setDataHoraAlteracao(LocalDateTime.now(ZoneId.of("America/Cuiaba")));
 
         return toDTO(checkInPetRepository.saveAndFlush(checkin));
     }
@@ -96,14 +97,14 @@ public class CheckInService {
             throw new IllegalStateException("Só é possível finalizar check-ins em INICIADO.");
 
         checkin.setStatus(StatusCheckInEnum.FINALIZADO);
-        checkin.setDataHoraFinalizacao(LocalDateTime.now());
+        checkin.setDataHoraFinalizacao(LocalDateTime.now(ZoneId.of("America/Cuiaba")));
 
         return toDTO(checkInPetRepository.saveAndFlush(checkin));
     }
 
     @Transactional(readOnly = true)
     public List<CheckInResponseDTO> listarCheckinsHoje() {
-        LocalDateTime start = LocalDate.now().atStartOfDay();
+        LocalDateTime start = LocalDate.now(ZoneId.of("America/Cuiaba")).atStartOfDay();
         LocalDateTime end = start.plusDays(1);
         return checkInPetRepository.findAllByDataHoraCriacaoBetween(start, end)
                 .stream().map(this::toDTO).toList();
@@ -150,7 +151,7 @@ public class CheckInService {
                 .orElseThrow(() -> new IllegalArgumentException("Check-in não encontrado."));
 
         // só do dia
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = LocalDate.now(ZoneId.of("America/Cuiaba"));
         if (entity.getDataHoraCriacao() == null ||
                 !entity.getDataHoraCriacao().toLocalDate().isEqual(hoje)) {
             throw new IllegalStateException("Só é permitido editar check-ins do dia atual.");
@@ -168,7 +169,7 @@ public class CheckInService {
         if (dto.getObservacoes() != null) entity.setObservacoes(dto.getObservacoes());
 
         entity.setAlterado(true); // marca a flag
-        entity.setDataHoraAlteracao(LocalDateTime.now());
+        entity.setDataHoraAlteracao(LocalDateTime.now(ZoneId.of("America/Cuiaba")));
 
         var saved = checkInPetRepository.save(entity);
         return toDTO(saved);

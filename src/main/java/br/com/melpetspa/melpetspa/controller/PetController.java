@@ -1,9 +1,6 @@
 package br.com.melpetspa.melpetspa.controller;
 
-import br.com.melpetspa.melpetspa.dto.CreatePetRequestDTO;
-import br.com.melpetspa.melpetspa.dto.PetResponseDTO;
-import br.com.melpetspa.melpetspa.dto.RacaResponseDTO;
-import br.com.melpetspa.melpetspa.dto.UpdatePhotoRequest;
+import br.com.melpetspa.melpetspa.dto.*;
 import br.com.melpetspa.melpetspa.entity.enums.SpecieEnum;
 import br.com.melpetspa.melpetspa.repository.PetRepository;
 import br.com.melpetspa.melpetspa.service.PetService;
@@ -40,12 +37,17 @@ public class PetController {
     }
     @GetMapping
     public List<PetResponseDTO> listarPets() {
-        return List.of();
+        return petService.lisAlltPets();
     }
 
     @PostMapping("/updateImage")
     public void atualizarFoto(@RequestBody @Valid UpdatePhotoRequest updatePhotoRequest) {
         petService.atualizarFotoPet(updatePhotoRequest);
     }
-}
 
+    @PostMapping("/updatepet")
+    public void atualizarpet(@RequestBody @Valid UpdatePetRequestDTO updatePetRequestDTO) {
+        petService.atualizarPet(updatePetRequestDTO);
+    }
+
+}

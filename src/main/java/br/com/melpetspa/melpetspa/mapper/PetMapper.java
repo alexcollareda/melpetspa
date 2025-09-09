@@ -13,7 +13,8 @@ public class PetMapper {
                 entity.getRace().getIdRace(),
                 entity.getRace().getNameRace(),
                 entity.getRace().getSpecie(),
-                entity.getPhotoUrl()
+                entity.getPhotoUrl(),
+                entity.getBirthDate()
         );
     }
 }
