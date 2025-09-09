@@ -20,7 +20,7 @@ COPY ${JAR_FILE} app.jar
 EXPOSE 8081
 
 # Comando para rodar a aplicação quando o contêiner iniciar
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Xmx256m", "-Xms64m", "-jar", "app.jar"]
 
 # Define um health check para verificar a saúde da aplicação Spring Boot
 # --interval: Frequência da verificação (a cada 30 segundos)
