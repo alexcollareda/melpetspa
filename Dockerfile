@@ -1,4 +1,4 @@
-# Usa uma imagem base Java Development Kit (JDK) 21 leve
+# Usa uma imagem base Java Development Kit (JDK) 21 lev
 FROM eclipse-temurin:21-jre-jammy
 
 # Instala 'curl' para ser usado na verificação de saúde (HEALTHCHECK)
